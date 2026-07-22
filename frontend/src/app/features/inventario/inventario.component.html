@@ -1,0 +1,129 @@
+<header class="cab">
+  <div>
+    <h1>Inventario</h1>
+    <p class="muted">Insumos, existencias y movimientos de stock.</p>
+  </div>
+  <button class="btn btn-primario" (click)="mostrarFormInsumo = !mostrarFormInsumo">
+    {{ mostrarFormInsumo ? '✕ Cerrar' : '+ Nuevo insumo' }}
+  </button>
+</header>
+
+<div class="msg msg-ok" *ngIf="mensaje">{{ mensaje }}</div>
+<div class="msg msg-error" *ngIf="error">{{ error }}</div>
+
+<!-- Formulario nuevo insumo -->
+<div class="card panel" *ngIf="mostrarFormInsumo">
+  <h3>Registrar insumo</h3>
+  <div class="form-grid">
+    <div><label>Código</label><input [(ngModel)]="nuevoInsumo.codigo" placeholder="ALB-38"></div>
+    <div><label>Nombre</label><input [(ngModel)]="nuevoInsumo.nombre" placeholder="Balanceado 38%"></div>
+    <div>
+      <label>Categoría</label>
+      <select [(ngModel)]="nuevoInsumo.categoriaId">
+        <option [ngValue]="0" disabled>Seleccione…</option>
+        <option *ngFor="let c of categorias" [ngValue]="c.id">{{ c.nombre }}</option>
+      </select>
+    </div>
+    <div>
+      <label>Proveedor</label>
+      <select [(ngModel)]="nuevoInsumo.proveedorId">
+        <option [ngValue]="null">— sin proveedor —</option>
+        <option *ngFor="let p of proveedores" [ngValue]="p.id">{{ p.nombre }}</option>
+      </select>
+    </div>
+    <div><label>Unidad</label><input [(ngModel)]="nuevoInsumo.unidadMedida" placeholder="kg"></div>
+    <div><label>Stock inicial</label><input type="number" [(ngModel)]="nuevoInsumo.stockInicial"></div>
+    <div><label>Stock mínimo</label><input type="number" [(ngModel)]="nuevoInsumo.stockMinimo"></div>
+    <div><label>Precio unitario</label><input type="number" [(ngModel)]="nuevoInsumo.precioUnitario"></div>
+  </div>
+  <div class="acciones">
+    <button class="btn btn-fantasma" (click)="mostrarFormInsumo = false">Cancelar</button>
+    <button class="btn btn-primario" (click)="crearInsumo()">Guardar insumo</button>
+  </div>
+</div>
+
+<!-- Tabla de insumos -->
+<div class="card mt">
+  <table class="tabla">
+    <thead>
+      <tr>
+        <th>Código</th><th>Insumo</th><th>Categoría</th>
+        <th>Stock</th><th>Mínimo</th><th>Precio</th><th>Estado</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let i of insumos">
+        <td class="mono">{{ i.codigo }}</td>
+        <td>{{ i.nombre }}</td>
+        <td>{{ i.categoriaNombre }}</td>
+        <td class="mono">{{ i.stockActual }} {{ i.unidadMedida }}</td>
+        <td class="mono muted">{{ i.stockMinimo }}</td>
+        <td class="mono">{{ i.precioUnitario | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+        <td>
+          <span class="badge" [ngClass]="i.stockBajo ? 'badge-alerta' : 'badge-ok'">
+            {{ i.stockBajo ? 'Stock bajo' : 'OK' }}
+          </span>
+        </td>
+        <td><button class="btn btn-peligro" (click)="eliminar(i)">Baja</button></td>
+      </tr>
+      <tr *ngIf="insumos.length === 0">
+        <td colspan="8" class="vacio">Aún no hay insumos registrados.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Registrar movimiento -->
+<h3 class="titulo-sec">Registrar movimiento de stock</h3>
+<div class="card panel">
+  <div class="form-grid">
+    <div>
+      <label>Insumo</label>
+      <select [(ngModel)]="mov.insumoId">
+        <option [ngValue]="0" disabled>Seleccione…</option>
+        <option *ngFor="let i of insumos" [ngValue]="i.id">{{ i.nombre }} ({{ i.stockActual }} {{ i.unidadMedida }})</option>
+      </select>
+    </div>
+    <div>
+      <label>Tipo</label>
+      <select [(ngModel)]="mov.tipo">
+        <option *ngFor="let t of tipos" [ngValue]="t">{{ t }}</option>
+      </select>
+    </div>
+    <div><label>Cantidad</label><input type="number" [(ngModel)]="mov.cantidad"></div>
+    <div><label>Motivo</label><input [(ngModel)]="mov.motivo" placeholder="Compra, consumo…"></div>
+    <div><label>Usuario</label><input [(ngModel)]="mov.usuario" placeholder="admin"></div>
+  </div>
+  <div class="acciones">
+    <button class="btn btn-primario" (click)="registrarMovimiento()">Registrar</button>
+  </div>
+</div>
+
+<!-- Movimientos recientes -->
+<h3 class="titulo-sec">Movimientos recientes</h3>
+<div class="card">
+  <table class="tabla">
+    <thead>
+      <tr><th>Fecha</th><th>Insumo</th><th>Tipo</th><th>Cantidad</th><th>Stock resultante</th><th>Motivo</th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let m of movimientos">
+        <td class="mono muted">{{ m.fecha | date:'dd/MM/yy HH:mm' }}</td>
+        <td>{{ m.insumoNombre }}</td>
+        <td>
+          <span class="badge" [ngClass]="{
+            'badge-ok': m.tipo === 'ENTRADA',
+            'badge-alerta': m.tipo === 'SALIDA',
+            'badge-neutro': m.tipo === 'AJUSTE'
+          }">{{ m.tipo }}</span>
+        </td>
+        <td class="mono">{{ m.cantidad }}</td>
+        <td class="mono">{{ m.stockResultante }}</td>
+        <td class="muted">{{ m.motivo }}</td>
+      </tr>
+      <tr *ngIf="movimientos.length === 0">
+        <td colspan="6" class="vacio">Sin movimientos todavía.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

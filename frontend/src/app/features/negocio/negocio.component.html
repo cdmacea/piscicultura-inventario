@@ -1,0 +1,128 @@
+<header class="cab">
+  <h1>Negocio</h1>
+  <p class="muted">Clientes y ventas de la finca.</p>
+</header>
+
+<div class="msg msg-ok" *ngIf="mensaje">{{ mensaje }}</div>
+<div class="msg msg-error" *ngIf="error">{{ error }}</div>
+
+<!-- CLIENTES -->
+<div class="titulo-sec">
+  <h3>Clientes</h3>
+  <button class="btn btn-primario" (click)="mostrarFormCliente = !mostrarFormCliente">
+    {{ mostrarFormCliente ? '✕ Cerrar' : '+ Nuevo cliente' }}
+  </button>
+</div>
+
+<div class="card panel" *ngIf="mostrarFormCliente">
+  <div class="form-grid">
+    <div><label>Nombre</label><input [(ngModel)]="nuevoCliente.nombre" placeholder="Pescadería El Buen Sabor"></div>
+    <div>
+      <label>Tipo doc.</label>
+      <select [(ngModel)]="nuevoCliente.tipoDocumento">
+        <option *ngFor="let t of tiposDoc" [ngValue]="t">{{ t }}</option>
+      </select>
+    </div>
+    <div><label>Documento</label><input [(ngModel)]="nuevoCliente.documento"></div>
+    <div><label>Teléfono</label><input [(ngModel)]="nuevoCliente.telefono"></div>
+    <div><label>Email</label><input [(ngModel)]="nuevoCliente.email"></div>
+    <div><label>Dirección</label><input [(ngModel)]="nuevoCliente.direccion"></div>
+  </div>
+  <div class="acciones">
+    <button class="btn btn-fantasma" (click)="mostrarFormCliente = false">Cancelar</button>
+    <button class="btn btn-primario" (click)="crearCliente()">Guardar cliente</button>
+  </div>
+</div>
+
+<div class="card mt">
+  <table class="tabla">
+    <thead><tr><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Email</th><th>Estado</th></tr></thead>
+    <tbody>
+      <tr *ngFor="let c of clientes">
+        <td>{{ c.nombre }}</td>
+        <td class="mono">{{ c.tipoDocumento }} {{ c.documento }}</td>
+        <td class="mono">{{ c.telefono || '—' }}</td>
+        <td class="muted">{{ c.email || '—' }}</td>
+        <td><span class="badge" [ngClass]="c.activo ? 'badge-ok' : 'badge-neutro'">{{ c.activo ? 'Activo' : 'Inactivo' }}</span></td>
+      </tr>
+      <tr *ngIf="clientes.length === 0"><td colspan="5" class="vacio">Sin clientes registrados.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- VENTAS -->
+<div class="titulo-sec">
+  <h3>Ventas</h3>
+  <button class="btn btn-primario" (click)="mostrarFormVenta = !mostrarFormVenta">
+    {{ mostrarFormVenta ? '✕ Cerrar' : '+ Nueva venta' }}
+  </button>
+</div>
+
+<div class="card panel" *ngIf="mostrarFormVenta">
+  <div class="form-grid">
+    <div><label>Código</label><input [(ngModel)]="nuevaVenta.codigo" placeholder="VTA-0003"></div>
+    <div>
+      <label>Cliente</label>
+      <select [(ngModel)]="nuevaVenta.clienteId">
+        <option [ngValue]="0" disabled>Seleccione…</option>
+        <option *ngFor="let c of clientes" [ngValue]="c.id">{{ c.nombre }}</option>
+      </select>
+    </div>
+    <div><label>Fecha</label><input type="date" [(ngModel)]="nuevaVenta.fecha"></div>
+    <div>
+      <label>Método de pago</label>
+      <select [(ngModel)]="nuevaVenta.metodoPago">
+        <option *ngFor="let m of metodosPago" [ngValue]="m">{{ m }}</option>
+      </select>
+    </div>
+  </div>
+
+  <h4 style="margin:1.2rem 0 .6rem">Líneas de venta</h4>
+  <div class="linea" *ngFor="let d of nuevaVenta.detalles; let i = index">
+    <div><label>Descripción</label><input [(ngModel)]="d.descripcion" placeholder="Tilapia entera fresca"></div>
+    <div><label>Cantidad (kg)</label><input type="number" [(ngModel)]="d.cantidadKg"></div>
+    <div><label>Precio / kg</label><input type="number" [(ngModel)]="d.precioKg"></div>
+    <button class="btn btn-peligro" (click)="quitarLinea(i)" [disabled]="nuevaVenta.detalles.length === 1">✕</button>
+  </div>
+  <button class="btn btn-fantasma" (click)="agregarLinea()">+ Agregar línea</button>
+
+  <div class="total">Total: {{ totalVenta | currency:'COP':'symbol-narrow':'1.0-0' }}</div>
+
+  <div class="acciones">
+    <button class="btn btn-fantasma" (click)="mostrarFormVenta = false">Cancelar</button>
+    <button class="btn btn-primario" (click)="crearVenta()">Registrar venta</button>
+  </div>
+</div>
+
+<div class="card mt">
+  <table class="tabla">
+    <thead>
+      <tr><th>Código</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Pago</th><th>Estado</th><th></th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let v of ventas">
+        <td class="mono">{{ v.codigo }}</td>
+        <td>{{ v.clienteNombre }}</td>
+        <td class="mono muted">{{ v.fecha | date:'dd/MM/yy' }}</td>
+        <td class="mono">{{ v.total | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+        <td class="muted">{{ v.metodoPago }}</td>
+        <td>
+          <span class="badge" [ngClass]="{
+            'badge-ok': v.estado === 'PAGADA',
+            'badge-alerta': v.estado === 'PENDIENTE',
+            'badge-neutro': v.estado === 'ANULADA'
+          }">{{ v.estado }}</span>
+        </td>
+        <td>
+          <button class="btn btn-fantasma" *ngIf="v.estado === 'PENDIENTE'" (click)="marcarPagada(v)">Marcar pagada</button>
+        </td>
+      </tr>
+      <tr *ngIf="ventas.length === 0"><td colspan="7" class="vacio">Sin ventas registradas.</td></tr>
+    </tbody>
+  </table>
+  <div class="paginador flex between" *ngIf="totalPaginasVentas > 1">
+    <button class="btn btn-fantasma" (click)="paginaAnterior()" [disabled]="paginaVentas === 0">← Anterior</button>
+    <span class="muted">Página {{ paginaVentas + 1 }} de {{ totalPaginasVentas }}</span>
+    <button class="btn btn-fantasma" (click)="paginaSiguiente()" [disabled]="paginaVentas >= totalPaginasVentas - 1">Siguiente →</button>
+  </div>
+</div>

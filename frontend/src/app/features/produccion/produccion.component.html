@@ -1,0 +1,121 @@
+<header class="cab">
+  <h1>Producción</h1>
+  <p class="muted">Estanques y lotes de peces en cultivo.</p>
+</header>
+
+<div class="msg msg-ok" *ngIf="mensaje">{{ mensaje }}</div>
+<div class="msg msg-error" *ngIf="error">{{ error }}</div>
+
+<!-- ESTANQUES -->
+<div class="titulo-sec">
+  <h3>Estanques</h3>
+  <button class="btn btn-primario" (click)="mostrarFormEstanque = !mostrarFormEstanque">
+    {{ mostrarFormEstanque ? '✕ Cerrar' : '+ Nuevo estanque' }}
+  </button>
+</div>
+
+<div class="card panel" *ngIf="mostrarFormEstanque">
+  <div class="form-grid">
+    <div><label>Código</label><input [(ngModel)]="nuevoEstanque.codigo" placeholder="EST-01"></div>
+    <div><label>Nombre</label><input [(ngModel)]="nuevoEstanque.nombre" placeholder="Estanque Norte"></div>
+    <div>
+      <label>Tipo</label>
+      <select [(ngModel)]="nuevoEstanque.tipo">
+        <option *ngFor="let t of tiposEstanque" [ngValue]="t">{{ t }}</option>
+      </select>
+    </div>
+    <div><label>Área (m²)</label><input type="number" [(ngModel)]="nuevoEstanque.areaM2"></div>
+    <div><label>Volumen (m³)</label><input type="number" [(ngModel)]="nuevoEstanque.volumenM3"></div>
+    <div><label>Capacidad máx.</label><input type="number" [(ngModel)]="nuevoEstanque.capacidadMax"></div>
+    <div>
+      <label>Estado</label>
+      <select [(ngModel)]="nuevoEstanque.estado">
+        <option *ngFor="let e of estadosEstanque" [ngValue]="e">{{ e }}</option>
+      </select>
+    </div>
+  </div>
+  <div class="acciones">
+    <button class="btn btn-fantasma" (click)="mostrarFormEstanque = false">Cancelar</button>
+    <button class="btn btn-primario" (click)="crearEstanque()">Guardar</button>
+  </div>
+</div>
+
+<div class="card mt">
+  <table class="tabla">
+    <thead>
+      <tr><th>Código</th><th>Nombre</th><th>Tipo</th><th>Área</th><th>Volumen</th><th>Estado</th><th></th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let e of estanques">
+        <td class="mono">{{ e.codigo }}</td>
+        <td>{{ e.nombre }}</td>
+        <td>{{ e.tipo }}</td>
+        <td class="mono">{{ e.areaM2 || '—' }}</td>
+        <td class="mono">{{ e.volumenM3 || '—' }}</td>
+        <td>
+          <span class="badge" [ngClass]="e.estado === 'ACTIVO' ? 'badge-ok' : 'badge-neutro'">{{ e.estado }}</span>
+        </td>
+        <td><button class="btn btn-peligro" (click)="eliminarEstanque(e)">Eliminar</button></td>
+      </tr>
+      <tr *ngIf="estanques.length === 0"><td colspan="7" class="vacio">Sin estanques registrados.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- LOTES -->
+<div class="titulo-sec">
+  <h3>Lotes</h3>
+  <button class="btn btn-primario" (click)="mostrarFormLote = !mostrarFormLote">
+    {{ mostrarFormLote ? '✕ Cerrar' : '+ Nuevo lote' }}
+  </button>
+</div>
+
+<div class="card panel" *ngIf="mostrarFormLote">
+  <div class="form-grid">
+    <div><label>Código</label><input [(ngModel)]="nuevoLote.codigo" placeholder="LOT-2025-03"></div>
+    <div>
+      <label>Especie</label>
+      <select [(ngModel)]="nuevoLote.especieId">
+        <option [ngValue]="0" disabled>Seleccione…</option>
+        <option *ngFor="let s of especies" [ngValue]="s.id">{{ s.nombreComun }}</option>
+      </select>
+    </div>
+    <div>
+      <label>Estanque</label>
+      <select [(ngModel)]="nuevoLote.estanqueId">
+        <option [ngValue]="0" disabled>Seleccione…</option>
+        <option *ngFor="let e of estanques" [ngValue]="e.id">{{ e.nombre }}</option>
+      </select>
+    </div>
+    <div><label>Fecha siembra</label><input type="date" [(ngModel)]="nuevoLote.fechaSiembra"></div>
+    <div><label>Cantidad inicial</label><input type="number" [(ngModel)]="nuevoLote.cantidadInicial"></div>
+    <div><label>Peso prom. (g)</label><input type="number" [(ngModel)]="nuevoLote.pesoPromedioG"></div>
+  </div>
+  <div class="acciones">
+    <button class="btn btn-fantasma" (click)="mostrarFormLote = false">Cancelar</button>
+    <button class="btn btn-primario" (click)="crearLote()">Sembrar lote</button>
+  </div>
+</div>
+
+<div class="card mt">
+  <table class="tabla">
+    <thead>
+      <tr><th>Código</th><th>Especie</th><th>Estanque</th><th>Siembra</th><th>Actual</th><th>Peso prom.</th><th>Estado</th><th></th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let l of lotes">
+        <td class="mono">{{ l.codigo }}</td>
+        <td>{{ l.especieNombre }}</td>
+        <td>{{ l.estanqueNombre }}</td>
+        <td class="mono muted">{{ l.fechaSiembra | date:'dd/MM/yy' }}</td>
+        <td class="mono">{{ l.cantidadActual | number }}</td>
+        <td class="mono">{{ l.pesoPromedioG }} g</td>
+        <td>
+          <span class="badge" [ngClass]="l.estado === 'ACTIVO' ? 'badge-ok' : 'badge-neutro'">{{ l.estado }}</span>
+        </td>
+        <td><button class="btn btn-peligro" (click)="eliminarLote(l)">Eliminar</button></td>
+      </tr>
+      <tr *ngIf="lotes.length === 0"><td colspan="8" class="vacio">Sin lotes registrados.</td></tr>
+    </tbody>
+  </table>
+</div>

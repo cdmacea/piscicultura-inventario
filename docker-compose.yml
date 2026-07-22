@@ -1,0 +1,37 @@
+# ============================================================================
+#  Levanta PostgreSQL + pgAdmin sin instalar nada localmente.
+#  Uso:  docker compose up -d
+#  pgAdmin:  http://localhost:5050   (admin@finca.co / changeme-local-dev)
+#  Postgres: localhost:5432          (postgres / changeme-local-dev)
+# ============================================================================
+services:
+  postgres:
+    image: postgres:16
+    container_name: piscicultura-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme-local-dev}
+      POSTGRES_DB: piscicultura
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      # Los scripts se ejecutan automáticamente en orden la primera vez:
+      - ./database/01_schema_inventario.sql:/docker-entrypoint-initdb.d/01_inventario.sql
+      - ./database/02_schema_produccion.sql:/docker-entrypoint-initdb.d/02_produccion.sql
+      - ./database/03_schema_negocio.sql:/docker-entrypoint-initdb.d/03_negocio.sql
+      - ./database/04_seed_data.sql:/docker-entrypoint-initdb.d/04_seed.sql
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: piscicultura-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@finca.co
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-changeme-local-dev}
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+volumes:
+  pg_data:

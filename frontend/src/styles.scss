@@ -1,0 +1,135 @@
+/* ============================================================
+   Sistema de diseño — Finca Piscícola
+   Paleta acuática: agua clara sobre profundidad
+   ============================================================ */
+:root {
+  --profundo:   #0B3B3C;   /* teal profundo (barra lateral) */
+  --profundo-2: #0F4E4A;
+  --agua:       #17A398;   /* acento principal */
+  --agua-claro: #57C7BC;
+  --coral:      #E8833A;   /* alertas / stock bajo */
+  --coral-suave:#FBE7D6;
+  --fondo:      #EEF4F3;   /* fondo general */
+  --superficie: #FFFFFF;
+  --tinta:      #12232E;   /* texto principal */
+  --tinta-2:    #4B5D66;   /* texto secundario */
+  --linea:      #DBE6E4;
+  --exito:      #1F9D6B;
+  --radio:      14px;
+  --sombra:     0 1px 2px rgba(11,59,60,.06), 0 8px 24px rgba(11,59,60,.06);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--fondo);
+  color: var(--tinta);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Sora', 'Inter', sans-serif;
+  color: var(--tinta);
+  margin: 0 0 .35em;
+  letter-spacing: -0.01em;
+}
+
+a { color: var(--agua); text-decoration: none; }
+
+/* ---- Botones ---- */
+.btn {
+  font: inherit;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  padding: .6rem 1.1rem;
+  cursor: pointer;
+  transition: transform .08s ease, background .15s ease, box-shadow .15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+}
+.btn:active { transform: translateY(1px); }
+.btn-primario { background: var(--agua); color: #fff; }
+.btn-primario:hover { background: #128e84; }
+.btn-fantasma {
+  background: transparent;
+  color: var(--tinta-2);
+  border: 1px solid var(--linea);
+}
+.btn-fantasma:hover { border-color: var(--agua); color: var(--agua); }
+.btn-peligro { background: #fff; color: #c0392b; border: 1px solid #f0c9c3; }
+.btn-peligro:hover { background: #fdecea; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ---- Tarjetas ---- */
+.card {
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+}
+
+/* ---- Formularios ---- */
+label { display: block; font-size: .8rem; font-weight: 600; color: var(--tinta-2); margin-bottom: .3rem; }
+input, select, textarea {
+  width: 100%;
+  font: inherit;
+  padding: .55rem .7rem;
+  border: 1px solid var(--linea);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--tinta);
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--agua);
+  box-shadow: 0 0 0 3px rgba(23,163,152,.15);
+}
+
+/* ---- Tablas ---- */
+.tabla { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.tabla th {
+  text-align: left;
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--tinta-2);
+  padding: .7rem .9rem;
+  border-bottom: 1px solid var(--linea);
+}
+.tabla td { padding: .75rem .9rem; border-bottom: 1px solid var(--linea); }
+.tabla tr:last-child td { border-bottom: none; }
+.tabla tbody tr:hover { background: #f6faf9; }
+
+/* ---- Badges ---- */
+.badge {
+  display: inline-block;
+  font-size: .72rem;
+  font-weight: 600;
+  padding: .2rem .55rem;
+  border-radius: 999px;
+}
+.badge-ok      { background: #e2f4ec; color: var(--exito); }
+.badge-alerta  { background: var(--coral-suave); color: var(--coral); }
+.badge-neutro  { background: #eef2f1; color: var(--tinta-2); }
+
+/* ---- Utilidades ---- */
+.grid-cards { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.flex { display: flex; }
+.between { justify-content: space-between; align-items: center; }
+.gap { gap: 1rem; }
+.mt { margin-top: 1.25rem; }
+.muted { color: var(--tinta-2); }
+.vacio { padding: 2.5rem; text-align: center; color: var(--tinta-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
